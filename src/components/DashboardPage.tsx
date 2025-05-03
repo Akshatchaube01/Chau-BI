@@ -1,177 +1,7 @@
-// import React from 'react';
-// import { motion } from 'framer-motion';
-// import { ArrowLeft, BarChart, PieChart, LineChart, Users, Activity, TrendingUp } from 'lucide-react';
-// import { Link } from 'react-router-dom';
-
-// const DashboardPage: React.FC = () => {
-//   return (
-//     <div className="min-h-screen bg-slate-950 text-white">
-//       {/* Header */}
-//       <header className="bg-indigo-950 p-4 shadow-md">
-//         <div className="container mx-auto flex justify-between items-center">
-//           <Link to="/" className="text-white hover:text-teal-400 transition-colors flex items-center gap-2">
-//             <ArrowLeft size={20} />
-//             <span>Back to Home</span>
-//           </Link>
-//           <div className="flex items-center gap-4">
-//             <div className="w-10 h-10 rounded-full bg-gradient-to-r from-teal-500 to-indigo-500 flex items-center justify-center">
-//               <span className="font-bold">AC</span>
-//             </div>
-//           </div>
-//         </div>
-//       </header>
-      
-//       {/* Main Content */}
-//       <main className="container mx-auto p-4 mt-8">
-//         <motion.div
-//           initial={{ opacity: 0, y: 20 }}
-//           animate={{ opacity: 1, y: 0 }}
-//           transition={{ duration: 0.5 }}
-//         >
-//           <h1 className="text-3xl font-bold mb-8">Analytics Dashboard</h1>
-          
-//           {/* Dashboard Grid */}
-//           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-//             {/* Stat Cards */}
-//             <StatCard 
-//               title="Users" 
-//               value="14,856" 
-//               change="+12.5%" 
-//               icon={<Users size={24} className="text-teal-400" />} 
-//             />
-//             <StatCard 
-//               title="Active Sessions" 
-//               value="2,485" 
-//               change="+8.2%" 
-//               icon={<Activity size={24} className="text-indigo-400" />} 
-//             />
-//             <StatCard 
-//               title="Conversion Rate" 
-//               value="3.8%" 
-//               change="+0.6%" 
-//               icon={<TrendingUp size={24} className="text-purple-400" />} 
-//             />
-//           </div>
-          
-//           {/* Charts */}
-//           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-//             <ChartCard 
-//               title="User Growth" 
-//               description="Last 6 months" 
-//               icon={<LineChart size={20} className="text-teal-400" />} 
-//             />
-//             <ChartCard 
-//               title="Traffic Sources" 
-//               description="Current month" 
-//               icon={<PieChart size={20} className="text-indigo-400" />} 
-//             />
-//           </div>
-          
-//           {/* Recent Activity */}
-//           <div className="bg-slate-900/70 rounded-xl p-6 border border-slate-800">
-//             <div className="flex justify-between items-center mb-6">
-//               <h2 className="text-xl font-semibold">Recent Activity</h2>
-//               <button className="text-teal-400 hover:text-teal-300 transition-colors text-sm">
-//                 View All
-//               </button>
-//             </div>
-            
-//             <div className="space-y-4">
-//               {[1, 2, 3, 4].map((item) => (
-//                 <ActivityItem key={item} />
-//               ))}
-//             </div>
-//           </div>
-//         </motion.div>
-//       </main>
-//     </div>
-//   );
-// };
-
-// const StatCard: React.FC<{
-//   title: string;
-//   value: string;
-//   change: string;
-//   icon: React.ReactNode;
-// }> = ({ title, value, change, icon }) => {
-//   return (
-//     <motion.div 
-//       className="bg-slate-900/70 rounded-xl p-6 border border-slate-800 hover:border-indigo-800/50 transition-all duration-300"
-//       whileHover={{ y: -5, transition: { duration: 0.2 } }}
-//     >
-//       <div className="flex justify-between items-start mb-4">
-//         <div>
-//           <h3 className="text-slate-400 text-sm mb-1">{title}</h3>
-//           <p className="text-3xl font-bold">{value}</p>
-//         </div>
-//         <div className="p-3 bg-slate-800/50 rounded-lg">
-//           {icon}
-//         </div>
-//       </div>
-//       <div className="flex items-center">
-//         <span className="text-emerald-500 text-sm">{change}</span>
-//         <span className="text-slate-400 text-sm ml-2">vs last period</span>
-//       </div>
-//     </motion.div>
-//   );
-// };
-
-// const ChartCard: React.FC<{
-//   title: string;
-//   description: string;
-//   icon: React.ReactNode;
-// }> = ({ title, description, icon }) => {
-//   return (
-//     <div className="bg-slate-900/70 rounded-xl p-6 border border-slate-800">
-//       <div className="flex justify-between items-center mb-4">
-//         <div>
-//           <h3 className="font-semibold mb-1">{title}</h3>
-//           <p className="text-slate-400 text-sm">{description}</p>
-//         </div>
-//         <div className="p-2 bg-slate-800/50 rounded-lg">
-//           {icon}
-//         </div>
-//       </div>
-      
-//       {/* Placeholder for chart */}
-//       <div className="mt-4 h-48 bg-slate-800/50 rounded-lg flex items-center justify-center">
-//         <div className="text-slate-500 text-sm">Chart Visualization</div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// const ActivityItem: React.FC = () => {
-//   const activities = [
-//     'New user registered',
-//     'Completed onboarding',
-//     'Created new dashboard',
-//     'Generated report'
-//   ];
-  
-//   const randomActivity = activities[Math.floor(Math.random() * activities.length)];
-//   const randomTime = Math.floor(Math.random() * 59) + 1;
-  
-//   return (
-//     <div className="flex items-center py-3 border-b border-slate-800 last:border-0">
-//       <div className="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500/30 to-teal-500/30 flex items-center justify-center mr-4">
-//         <span className="text-xs">U{Math.floor(Math.random() * 99) + 1}</span>
-//       </div>
-//       <div className="flex-1">
-//         <p className="text-sm">{randomActivity}</p>
-//         <p className="text-xs text-slate-500">{randomTime} minutes ago</p>
-//       </div>
-//       <button className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
-//         View
-//       </button>
-//     </div>
-//   );
-// };
-
-// export default DashboardPage;
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react'; 
+import html2canvas from 'html2canvas'; 
 import { motion } from 'framer-motion';
-import { ArrowLeft, BarChart, PieChart, LineChart, Users, Activity, TrendingUp, Upload } from 'lucide-react';
+import { ArrowLeft, BarChart, PieChart, LineChart, Users, Activity, TrendingUp, Upload,Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { read, utils } from 'xlsx';
 import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart as RechartsBarChart, Bar, PieChart as RechartsPieChart, Pie, Cell } from 'recharts';
@@ -186,7 +16,17 @@ const DashboardPage: React.FC = () => {
   const [columns, setColumns] = useState<string[]>([]);
   const [selectedXAxis, setSelectedXAxis] = useState<string>('');
   const [selectedYAxis, setSelectedYAxis] = useState<string>('');
-
+  const chartRef = useRef<HTMLDivElement>(null);
+  const handleDownloadChart = async () => {
+    if (!chartRef.current) return;
+  
+    const canvas = await html2canvas(chartRef.current);
+    const link = document.createElement('a');
+    link.download = `chart-${Date.now()}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
+  };
+  
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -356,6 +196,7 @@ const DashboardPage: React.FC = () => {
                       </div>
                     </>
                   )}
+                  
                 </div>
               </div>
               
@@ -380,10 +221,19 @@ const DashboardPage: React.FC = () => {
                 </div>
               </div>
             </div>
-
+            <div className="flex justify-end mb-4">
+            <button
+              onClick={handleDownloadChart}
+              className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg">
+              <Download size={16} />
+            </button>
+            </div>
             <div className="mt-8 bg-slate-800/50 rounded-lg p-6 overflow-x-auto">
               {chartData.length > 0 ? (
-                renderChart()
+                <div ref={chartRef}>
+                {renderChart()}
+              </div>
+              
               ) : (
                 <div className="text-center text-slate-400 py-12">
                   Upload an Excel file to visualize your data
