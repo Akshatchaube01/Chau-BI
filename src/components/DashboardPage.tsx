@@ -3,7 +3,7 @@ import html2canvas from 'html2canvas';
 import { motion } from 'framer-motion';
 import { ArrowLeft, BarChart, PieChart, LineChart, Users, Activity, TrendingUp, Upload,Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { read, utils } from 'xlsx';
+import { read, utils,writeFile } from 'xlsx';
 import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart as RechartsBarChart, Bar, PieChart as RechartsPieChart, Pie, Cell } from 'recharts';
 
 interface ChartData {
@@ -25,6 +25,36 @@ const DashboardPage: React.FC = () => {
     link.download = `chart-${Date.now()}.png`;
     link.href = canvas.toDataURL();
     link.click();
+  };
+  const handleDownloadCSV = () => {
+    if (!chartData.length) return;
+  
+    const csvRows: string[] = [];
+  
+    // Header
+    csvRows.push(columns.join(','));
+  
+    // Rows
+    chartData.forEach(row => {
+      const values = columns.map(col => JSON.stringify(row[col] ?? ''));
+      csvRows.push(values.join(','));
+    });
+  
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `data-export-${Date.now()}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  };
+  const handleDownloadXLSX = () => {
+    if (!chartData.length) return;
+  
+    const worksheet = utils.json_to_sheet(chartData);
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, 'ChartData');
+    writeFile(workbook, `data-export-${Date.now()}.xlsx`);
   };
   
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,6 +134,7 @@ const DashboardPage: React.FC = () => {
         );
     }
   };
+  const isChartDataAvailable = chartData.length > 0;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -167,7 +198,6 @@ const DashboardPage: React.FC = () => {
                       <option value="pie">Pie Chart</option>
                     </select>
                   </div>
-                  
                   {columns.length > 0 && (
                     <>
                       <div>
@@ -224,9 +254,41 @@ const DashboardPage: React.FC = () => {
             <div className="flex justify-end mb-4">
             <button
               onClick={handleDownloadChart}
-              className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg">
+              disabled={!isChartDataAvailable}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+              isChartDataAvailable
+              ? 'bg-teal-600 hover:bg-teal-700 text-white'
+              : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+              }`}
+              >
               <Download size={16} />
+                 Chart
             </button>
+            <button
+              onClick={handleDownloadCSV}
+              disabled={!isChartDataAvailable}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg ml-4 ${
+              isChartDataAvailable
+              ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+              : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+              }`}
+              >
+              <Download size={16} />
+               CSV
+          </button>
+
+          <button
+            onClick={handleDownloadXLSX}
+            disabled={!isChartDataAvailable}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg ml-4 ${
+            isChartDataAvailable
+            ? 'bg-purple-600 hover:bg-purple-700 text-white'
+            : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+            }`}
+            >
+            <Download size={16} />
+            XLSX
+          </button>
             </div>
             <div className="mt-8 bg-slate-800/50 rounded-lg p-6 overflow-x-auto">
               {chartData.length > 0 ? (
