@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react'; 
 import html2canvas from 'html2canvas'; 
 import { motion } from 'framer-motion';
+import { jsPDF } from 'jspdf';
 import { ArrowLeft, BarChart, PieChart, LineChart, Users, Activity, TrendingUp, Upload,Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { read, utils,writeFile } from 'xlsx';
@@ -56,7 +57,19 @@ const DashboardPage: React.FC = () => {
     utils.book_append_sheet(workbook, worksheet, 'ChartData');
     writeFile(workbook, `data-export-${Date.now()}.xlsx`);
   };
-  
+  const handleExportPDF = () => {
+    if (!chartRef.current) return;
+    html2canvas(chartRef.current).then((canvas) => {
+      const pdf = new jsPDF();
+      const imgData = canvas.toDataURL('image/png');
+      pdf.addImage(imgData, 'PNG', 10, 10, 180, 160);
+      pdf.setFontSize(12);
+      pdf.text('Analytics Report', 10, 180);
+      pdf.text('Date: ' + new Date().toLocaleDateString(), 10, 190);
+      pdf.save('chart_report.pdf');
+    });
+  };
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -237,28 +250,23 @@ const DashboardPage: React.FC = () => {
                         </select>
                       </div>
                       <div className="relative">
-  <label className="block text-sm font-medium text-slate-300 mb-2">Y Axis (Multiple)</label>
-  <select
-    multiple
-    value={selectedYAxes}
-    onChange={(e) =>
-      setSelectedYAxes(Array.from(e.target.selectedOptions, (option) => option.value))
-    }
-    className="w-full h-32 bg-slate-800 border border-slate-700 rounded-lg p-2 text-white overflow-y-scroll scrollbar-hide"
-  >
-    {columns.map((column) => (
-      <option key={column} value={column}>{column}</option>
-    ))}
-  </select>
-</div>
-
-
+                          <label className="block text-sm font-medium text-slate-300 mb-2">Y Axis (Multiple)</label>
+                            <select
+                            multiple
+                            value={selectedYAxes}
+                            onChange={(e) =>
+                            setSelectedYAxes(Array.from(e.target.selectedOptions, (option) => option.value))
+                            }
+                            className="w-full h-32 bg-slate-800 border border-slate-700 rounded-lg p-2 text-white overflow-y-scroll scrollbar-hide">
+                            {columns.map((column) => (
+                            <option key={column} value={column}>{column}</option>
+                            ))}
+                            </select>
+                      </div>
                     </>
                   )}
-                  
                 </div>
               </div>
-              
               <div className="flex-1">
                 <h2 className="text-xl font-semibold mb-4">Import Data</h2>
                 <div className="border-2 border-dashed border-slate-700 rounded-lg p-8 text-center">
@@ -305,7 +313,6 @@ const DashboardPage: React.FC = () => {
               <Download size={16} />
                CSV
           </button>
-
           <button
             onClick={handleDownloadXLSX}
             disabled={!isChartDataAvailable}
@@ -317,6 +324,18 @@ const DashboardPage: React.FC = () => {
             >
             <Download size={16} />
             XLSX
+          </button>
+          <button
+            onClick={handleExportPDF}
+            disabled={!isChartDataAvailable}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg ml-4 ${
+            isChartDataAvailable
+            ? 'bg-rose-600 hover:bg-rose-700 text-white'
+            : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+            }`}
+            >
+            <Download size={16} />
+            PDF
           </button>
             </div>
             <div className="mt-8 bg-slate-800/50 rounded-lg p-6 overflow-x-auto">
