@@ -15,7 +15,7 @@ const DashboardPage: React.FC = () => {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [columns, setColumns] = useState<string[]>([]);
   const [selectedXAxis, setSelectedXAxis] = useState<string>('');
-  const [selectedYAxis, setSelectedYAxis] = useState<string>('');
+  const [selectedYAxes, setSelectedYAxes] = useState<string[]>([]);
   const chartRef = useRef<HTMLDivElement>(null);
   const handleDownloadChart = async () => {
     if (!chartRef.current) return;
@@ -72,11 +72,19 @@ const DashboardPage: React.FC = () => {
         const jsonData = utils.sheet_to_json<ChartData>(worksheet);
         
         if (jsonData.length > 0) {
-          setColumns(Object.keys(jsonData[0]));
+          const keys = Object.keys(jsonData[0]);
+          setColumns(keys);
           setChartData(jsonData);
-          setSelectedXAxis(Object.keys(jsonData[0])[0]);
-          setSelectedYAxis(Object.keys(jsonData[0])[1]);
+          setSelectedXAxis(keys[0]);
+        
+          // Select the next 1 or 2 numeric keys as default Y-axes
+          const numericKeys = keys.filter(
+            key => typeof jsonData[0][key] === 'number'
+          );
+        
+          setSelectedYAxes(numericKeys.slice(0, 2)); // e.g., ['Revenue', 'Users']
         }
+        
       } catch (error) {
         console.error('Error processing file:', error);
         // You might want to show an error message to the user here
@@ -99,7 +107,14 @@ const DashboardPage: React.FC = () => {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey={selectedYAxis} stroke="#8884d8" />
+            {selectedYAxes.map((key, index) => (
+              <Line
+                key={key}
+                type="monotone"
+                dataKey={key}
+                stroke={COLORS[index % COLORS.length]}
+              />
+            ))}
           </RechartsLineChart>
         );
       case 'bar':
@@ -110,28 +125,37 @@ const DashboardPage: React.FC = () => {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey={selectedYAxis} fill="#8884d8" />
+            {selectedYAxes.map((key, index) => (
+              <Bar
+                key={key}
+                dataKey={key}
+                fill={COLORS[index % COLORS.length]}
+              />
+            ))}
           </RechartsBarChart>
         );
-      case 'pie':
-        return (
-          <RechartsPieChart width={400} height={300} className="mx-auto">
-            <Pie
-              data={chartData}
-              cx={200}
-              cy={150}
-              labelLine={false}
-              nameKey={selectedXAxis}
-              dataKey={selectedYAxis}
-            >
-              {chartData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </RechartsPieChart>
-        );
+      
+        case 'pie':
+          if (selectedYAxes.length === 0) return null;
+          return (
+            <RechartsPieChart width={400} height={300} className="mx-auto">
+              <Pie
+                data={chartData}
+                cx={200}
+                cy={150}
+                labelLine={false}
+                nameKey={selectedXAxis}
+                dataKey={selectedYAxes[0]}
+              >
+                {chartData.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </RechartsPieChart>
+          );
+        
     }
   };
   const isChartDataAvailable = chartData.length > 0;
@@ -212,18 +236,23 @@ const DashboardPage: React.FC = () => {
                           ))}
                         </select>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Y Axis</label>
-                        <select
-                          value={selectedYAxis}
-                          onChange={(e) => setSelectedYAxis(e.target.value)}
-                          className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white"
-                        >
-                          {columns.map((column) => (
-                            <option key={column} value={column}>{column}</option>
-                          ))}
-                        </select>
-                      </div>
+                      <div className="relative">
+  <label className="block text-sm font-medium text-slate-300 mb-2">Y Axis (Multiple)</label>
+  <select
+    multiple
+    value={selectedYAxes}
+    onChange={(e) =>
+      setSelectedYAxes(Array.from(e.target.selectedOptions, (option) => option.value))
+    }
+    className="w-full h-32 bg-slate-800 border border-slate-700 rounded-lg p-2 text-white overflow-y-scroll scrollbar-hide"
+  >
+    {columns.map((column) => (
+      <option key={column} value={column}>{column}</option>
+    ))}
+  </select>
+</div>
+
+
                     </>
                   )}
                   
